@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectMongoDB from './db/connectMongoDB.js';
-
+// / Routes
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ await connectMongoDB();
 app.use(cors());
 app.use(express.json());
 
+// ! Routes
+app.use(userRoutes);
 
 // test route
 app.get('/', (req, res) => {
