@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectMongoDB from './db/connectMongoDB.js';
 
+import categoryRoutes from './routes/categoryRoutes.js'; // імпорт роутів категорій
+
 
 dotenv.config();
 
@@ -20,6 +22,9 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.json({ message: 'Backend is running' });
 });
+
+// роут для категорій
+app.use('/api', categoryRoutes);
 
 // 404 handler
 app.use((req, res) => {

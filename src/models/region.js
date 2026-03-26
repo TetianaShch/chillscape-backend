@@ -1,7 +1,6 @@
-//export { };
 import { Schema, model } from "mongoose";
 
-const locationTypeSchema = new Schema({
+const regionSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -13,5 +12,5 @@ const locationTypeSchema = new Schema({
   },
 });
 
-const LocationType = model('LocationType', locationTypeSchema);
-export default LocationType;
+const Region = model('Region', regionSchema);
+export default Region;
