@@ -61,7 +61,7 @@ https://chillscape-backend.onrender.com
 
 ## Project Structure
 
-index.js — server entry point (express app, middleware, routes, server start)
+server.js — server entry point (express app, middleware, routes, server start)
 Folders
 routes/ — API routes
 controllers/ — request handling logic
