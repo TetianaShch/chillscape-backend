@@ -1,10 +1,13 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import connectMongoDB from './db/connectMongoDB.js';
 
+
 import categoryRoutes from './routes/categoryRoutes.js'; // імпорт роутів категорій
 
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -16,7 +19,10 @@ await connectMongoDB();
 // middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
+// routes
+app.use(authRoutes);
 
 // test route
 app.get('/', (req, res) => {
@@ -32,8 +38,9 @@ app.use((req, res) => {
 });
 
 // base error handler
-app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message || 'Server error' });
+app.use((err, req, res, _next) => {
+  const status = err.status || 500;
+  res.status(status).json({ message: err.message || 'Server error' });
 });
 
 app.listen(PORT, () => {
