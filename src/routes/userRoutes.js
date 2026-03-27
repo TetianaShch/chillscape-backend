@@ -5,9 +5,9 @@ import {
 } from '../controllers/userController.js';
 import authenticate from '../middlewares/authenticate.js';
 
-const userRouter = express.Router();
+const userRoutes = express.Router();
 
-userRouter.get('/current', authenticate, getCurrentUserController); //need exact name of the auth middleware
-userRouter.get('/:userId', getUserByIdController);
+userRoutes.get('/current', authenticate, getCurrentUserController);
+userRoutes.get('/:userId', getUserByIdController);
 
-export default userRouter;
+export default userRoutes;
