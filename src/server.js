@@ -6,10 +6,10 @@ import connectMongoDB from './db/connectMongoDB.js';
 import locationRoutes from './routes/locationRoutes.js';
 
 
-
 import categoryRoutes from './routes/categoryRoutes.js'; // імпорт роутів категорій
 
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -26,6 +26,7 @@ app.use(cookieParser());
 
 // routes
 app.use(authRoutes);
+app.use(userRoutes);
 
 // test route
 app.get('/', (req, res) => {
