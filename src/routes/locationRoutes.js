@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { celebrate } from 'celebrate';
-import { upload } from '../middleware/upload.js';
+import { authenticate } from '../middlewares/authenticate.js';
 // TODO: перевірити правильність імпортів (назви експортів і шляхи) після реалізації контролерів і схем
 
 import {
@@ -18,10 +18,13 @@ import {
   updateLocationSchema,
 } from '../validations/locationValidation.js';
 
-import { authenticate } from '../middleware/authenticate.js';
+
 
 const router = Router();
 //public routes
+router.get('/test', (req, res) => {
+  res.json({ message: "Маршрут працює!" });
+});
 router.get('/locations', celebrate(getLocationsSchema), getLocations);
 router.get(
   '/locations/:locationId',
@@ -40,7 +43,7 @@ router.delete(
 router.patch(
   '/locations/:locationId',
   authenticate,
-  upload.array('images'), // 'images' — название поля из твоего ТЗ
+  upload.array('images'),
   celebrate(updateLocationSchema),
   updateLocation
 );

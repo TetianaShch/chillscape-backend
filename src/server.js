@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import connectMongoDB from './db/connectMongoDB.js';
 import authRoutes from './routes/authRoutes.js';
+import locationRoutes from './routes/locationRoutes.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 
 // routes
 app.use(authRoutes);
+app.use(locationRoutes);
 
 // test route
 app.get('/', (req, res) => {
