@@ -13,29 +13,31 @@ export const createSession = async (userId) => {
   return session;
 };
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'none',
+};
+
 export const setSessionCookies = (res, session) => {
   res.cookie('accessToken', session.accessToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    ...cookieOptions,
     maxAge: FIFTEEN_MINUTES,
   });
   res.cookie('refreshToken', session.refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    ...cookieOptions,
     maxAge: ONE_DAY,
   });
   res.cookie('sessionId', session._id.toString(), {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    ...cookieOptions,
     maxAge: ONE_DAY,
   });
 };
 
 export const clearSessionCookies = (res) => {
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken');
-  res.clearCookie('sessionId');
+  res.clearCookie('accessToken', cookieOptions);
+  res.clearCookie('refreshToken', cookieOptions);
+  res.clearCookie('sessionId', cookieOptions);
 };
+
+
