@@ -39,3 +39,4 @@ export const clearSessionCookies = (res) => {
   res.clearCookie('refreshToken');
   res.clearCookie('sessionId');
 };
+
