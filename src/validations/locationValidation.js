@@ -10,7 +10,11 @@ export const getAllLocationsSchema = {
     search: Joi.string().allow('').optional(),
   }),
 };
-
+export const getLocationIdSchema = {
+  [Segments.PARAMS]: Joi.object().keys({
+    locationId: Joi.string().hex().length(24).required(),
+  }),
+};
 export const createLocationSchema = {
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().min(3).max(96).required(),
