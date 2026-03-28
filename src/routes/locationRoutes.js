@@ -11,6 +11,7 @@ import {
   getAllLocationsSchema,
   createLocationSchema,
   getLocationIdSchema,
+  updateLocationSchema
 } from '../validations/locationValidation.js';
 
 const router = Router();
@@ -18,7 +19,7 @@ const router = Router();
 router.get('/', celebrate(getAllLocationsSchema), getAllLocations);
 router.get('/:locationId', celebrate(getLocationIdSchema), getLocationById);
 router.post('/', authenticate, celebrate(createLocationSchema), createLocation);
-router.patch('/:locationId', authenticate, celebrate(), updateLocation);
+router.patch('/:locationId', authenticate, celebrate(updateLocationSchema), updateLocation);
 
 export default router;
 
