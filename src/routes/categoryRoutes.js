@@ -1,6 +1,3 @@
-//export { };
-
-
 import { Router } from 'express';
 
 import {
@@ -10,7 +7,7 @@ import {
 
 const router = Router();
 
-router.get('/categories', getCategoriesWithRegions);
-router.get('/categories/location-types', getCategoriesWithLocationTypes);
+router.get('/', getCategoriesWithRegions);
+router.get('/location-types', getCategoriesWithLocationTypes);
 
 export default router;
