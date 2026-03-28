@@ -25,6 +25,16 @@ export const createLocationSchema = {
   }),
 };
 
+export const updateLocationSchema = {
+  [Segments.BODY]: Joi.object().keys({
+    name: Joi.string().min(3).max(96),
+    type: Joi.string().max(64),
+    region: Joi.string().max(64),
+    description: Joi.string().min(20).max(6000),
+    images: Joi.array().items(Joi.string()).min(1),
+  }),
+};
+
 
 
 

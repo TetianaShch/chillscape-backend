@@ -18,6 +18,7 @@ const router = Router();
 router.get('/', celebrate(getAllLocationsSchema), getAllLocations);
 router.get('/:locationId', celebrate(getLocationIdSchema), getLocationById);
 router.post('/', authenticate, celebrate(createLocationSchema), createLocation);
-router.patch('/:locationId', authenticate, celebrate(createLocationSchema), updateLocation);
+router.patch('/:locationId', authenticate, celebrate(), updateLocation);
 
 export default router;
+
