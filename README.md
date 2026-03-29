@@ -39,28 +39,64 @@ Create a `.env` file based on `.env.example`
 - PORT
 - MONGO_URL
 
-## API
-
-### Base endpoint
-
-```
+Base Endpoint
 GET /
-```
 
-Response:
+## Response:
 
 ```json
 { "message": "Backend is running" }
 ```
 
+## Authentication is handled via HTTP-only cookies:
+
+- accessToken
+- refreshToken
+- sessionId
+
+## API Endpoints
+
+### Auth
+
+- POST /api/auth/register
+- POST /api/auth/login
+- POST /api/auth/logout
+- POST /api/auth/refresh
+
+### Users
+
+- GET /api/users/current
+- GET /api/users/:userId
+
+### Locations
+
+- GET /api/locations
+- GET /api/locations/:locationId
+- POST /api/locations (private)
+- PATCH /api/locations/:locationId (private)
+
+Query params:
+
+- page
+- limit
+- region
+- type
+- search
+
+### Categories
+
+- GET /api/categories
+- GET /api/categories/location-types
+
+### Feedbacks
+
+- GET /api/feedbacks/:placeId
+- POST /api/feedbacks (private)
+
 ## Deployment
 
 Deployed on Render:
 https://chillscape-backend.onrender.com
-
-## Description
-
-Backend for Chillscape application (Node.js, Express, MongoDB)
 
 ## Project Structure
 
