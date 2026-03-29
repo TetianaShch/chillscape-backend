@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { connectMongoDB } from './db/connectMongoDB.js';
 import locationRoutes from './routes/locationRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
 
 
 import categoryRoutes from './routes/categoryRoutes.js'; // імпорт роутів категорій
@@ -36,6 +37,10 @@ app.get('/', (req, res) => {
 
 // роут для категорій
 app.use('/api', categoryRoutes);
+
+
+// роут для фідбека
+app.use('/api/feedbacks', feedbackRoutes);
 
 // 404 handler
 app.use((req, res) => {
