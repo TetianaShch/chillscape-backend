@@ -21,6 +21,6 @@ const asyncHandler = (fn) => (req, res, next) => {
 router.post('/register', celebrate(registerUserSchema), asyncHandler(registerUser));
 router.post('/login', celebrate(loginUserSchema), asyncHandler(loginUser));
 router.post('/logout', asyncHandler(logoutUser));
-router.post('refresh', asyncHandler(refreshUserSession));
+router.post('/refresh', asyncHandler(refreshUserSession));
 
 export default router;
