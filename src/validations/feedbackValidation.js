@@ -17,4 +17,3 @@ export const createFeedbackSchema = {
     comment: Joi.string().min(3).max(500).required(),
   }),
 };
-feedbackSchema.index({ place: 1 });

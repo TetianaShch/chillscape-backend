@@ -26,6 +26,6 @@ const feedbackSchema = new Schema(
   },
   { timestamps: true }
 );
-
+feedbackSchema.index({ place: 1, user: 1 }, { unique: true });
 const Feedback = model("Feedback", feedbackSchema);
 export default Feedback;
