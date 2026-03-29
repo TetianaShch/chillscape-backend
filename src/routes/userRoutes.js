@@ -1,13 +1,21 @@
-import express from 'express';
+// / Libraries
+import { Router } from 'express';
+import { celebrate } from 'celebrate';
+// / Validations
+import { getUserLocationsSchema } from '../validations/userValidation.js';
+// / Controllers
 import {
   getCurrentUserController,
   getUserByIdController,
+  getUserLocations,
 } from '../controllers/userController.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
-const userRoutes = express.Router();
+const router = Router();
 
-userRoutes.get('/current', authenticate, getCurrentUserController);
-userRoutes.get('/:userId', getUserByIdController);
+// ! GET
+router.get('/current', authenticate, getCurrentUserController);
+router.get('/:userId', getUserByIdController);
+router.get('/:userId/locations', celebrate(getUserLocationsSchema), getUserLocations);
 
-export default userRoutes;
+export default router;

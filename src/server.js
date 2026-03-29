@@ -2,13 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-
 import { connectMongoDB } from './db/connectMongoDB.js';
+// / Routes
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import locationRoutes from './routes/locationRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
-
+// / Middlewares
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -25,8 +25,10 @@ await connectMongoDB();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use('/api', categoryRoutes);
 
-// routes
+// ! Routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/locations', locationRoutes);
