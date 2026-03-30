@@ -1,5 +1,3 @@
-//export { };
-
 import { Schema, model} from "mongoose";
 
 const categorySchema = new Schema({
