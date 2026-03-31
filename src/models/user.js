@@ -7,9 +7,20 @@ const userSchema = new Schema(
       required: true,
       trim: true,
     },
-    avatarUrl: {
+    email: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+
+    avatarUrl: {
+      type: String,
+      default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
     },
     articlesAmount: {
       type: Number,
