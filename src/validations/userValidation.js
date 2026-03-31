@@ -6,7 +6,10 @@ export const getUserLocationsSchema = {
     userId: Joi.string().hex().length(24).required(),
   }),
   [Segments.QUERY]: Joi.object({
-    page: Joi.number().min(1).default(1),
-    limit: Joi.number().min(1).max(100).default(10),
+    page: Joi.number().integer().min(1).default(1),
+    limit: Joi.number().integer().min(5).max(20).default(10),
+    search: Joi.string().trim().allow(''),
+    sortBy: Joi.string().valid('_id', 'name'),
+    sortOrder: Joi.string().valid('asc', 'desc'),
   }),
 };

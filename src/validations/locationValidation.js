@@ -26,6 +26,9 @@ export const createLocationSchema = {
 };
 
 export const updateLocationSchema = {
+  [Segments.PARAMS]: Joi.object().keys({
+    locationId: Joi.string().hex().length(24).required(),
+  }),
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().min(3).max(96),
     type: Joi.string().max(64),
