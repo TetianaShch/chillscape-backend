@@ -1,65 +1,32 @@
-import Category from '../models/category.js';
 import Region from '../models/region.js';
 import LocationType from '../models/locationType.js';
 
-export const getCategoriesWithRegions = async (req, res) => {
+export const getAllRegions = async (req, res, next) => {
   try {
-    // 1. беремо всі категорії
-    const categories = await Category.find();
+    const regions = await Region.find(); // просто беремо всі регіони
 
-    const result = [];
-
-    // 2. для кожної категорії шукаємо регіони
-    for (const cat of categories) {
-      const regions = await Region.find({ category: cat._id });
-
-      // 3. формуємо відповідь
-      result.push({
-        id: cat._id,
-        name: cat.name,
-        regions: regions.map(r => ({
-          id: r._id,
-          name: r.name,
-        })),
-      });
-    }
-
-    res.json(result);
-
+    res.status(200).json({
+      status: 200,
+      message: 'Successfully found regions!',
+      data: regions, // віддаємо як є
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    next(error); // тут потрібен next → ти його не передала в параметри
   }
 };
 
-export const getCategoriesWithLocationTypes = async (req, res) => {
+export const getAllLocationTypes = async (req, res, next) => {
   try {
-    // 1. беремо всі категорії
-    const categories = await Category.find();
+    const locationTypes = await LocationType.find();
+    // беремо всі типи, без циклів і category
 
-    const result = [];
-
-    // 2. для кожної категорії шукаємо типи
-    for (const cat of categories) {
-      const locationTypes = await LocationType.find({
-        category: cat._id,
-      });
-
-      // 3. формуємо відповідь
-      result.push({
-        id: cat._id,
-        name: cat.name,
-        locationTypes: locationTypes.map(lt => ({
-          id: lt._id,
-          name: lt.name,
-        })),
-      });
-    }
-
-    res.json(result);
+    res.status(200).json({
+      status: 200,
+      message: 'Successfully found location types!',
+      data: locationTypes, // просто віддаємо масив
+    });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    next(error); // замість console.error
   }
 };

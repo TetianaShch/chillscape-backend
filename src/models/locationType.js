@@ -1,16 +1,25 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 
-const locationTypeSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
+const locationTypeSchema = new Schema(
+  {
+    type: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+    },
+    shortDescription: {
+      type: String,
+      trim: true,
+    },
   },
-  category: {
-    type: Schema.Types.ObjectId,
-    ref: 'Category',
-    required: true,
-  },
-});
+  { timestamps: true, versionKey: false },
+);
 
 const LocationType = model('LocationType', locationTypeSchema);
 export default LocationType;

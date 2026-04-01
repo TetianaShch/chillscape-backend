@@ -1,28 +1,32 @@
 import { Location } from '../models/location.js';
 import createHttpError from 'http-errors';
 
+
 export const getAllLocations = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, region, type, search } = req.query;
-
+    const { page = 1, limit = 10, region, locationType, type, search } = req.query;
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
     const filter = {};
 
     if (region) filter.region = region;
-    if (type) filter.type = type;
+    if (locationType || type) filter.locationType = locationType || type;
     if (search) filter.name = { $regex: search, $options: 'i' };
 
-    const skip = (page - 1) * limit;
+    const skip = (pageNumber - 1) * limitNumber;
 
     const [locations, totalLocations] = await Promise.all([
-      Location.find(filter).skip(skip).limit(Number(limit)),
+      Location.find(filter).skip(skip).limit(limitNumber),
       Location.countDocuments(filter),
     ]);
 
-    const totalPages = Math.ceil(totalLocations / limit);
+    const totalPages = Math.ceil(totalLocations / limitNumber);
 
     res.status(200).json({
-      page: Number(page),
-      perPage: Number(limit),
+      status: 200,
+      message: 'Successfully found locations!',
+      page: pageNumber,
+      perPage: limitNumber,
       totalLocations,
       totalPages,
       locations,
@@ -31,12 +35,13 @@ export const getAllLocations = async (req, res, next) => {
     next(error);
   }
 };
+
 export const getLocationById = async (req, res, next) => {
   const { locationId } = req.params;
   try {
-    const data = await Location.findById(locationId);
-    if (!data) throw createHttpError(404, 'Location not found');
-    res.json({ status: 200, message: `Successfully found location with id ${locationId}!`, data });
+    const location = await Location.findById(locationId);
+    if (!location) throw createHttpError(404, 'Location not found');
+    res.json({ status: 200, message: `Successfully found location with id ${locationId}!`, data: location });
   } catch (error) {
     next(error);
   }
@@ -45,7 +50,7 @@ export const createLocation = async (req, res, next) => {
   try {
     const location = await Location.create({
       ...req.body,
-      createdBy: req.user._id,
+      ownerId: req.user._id,
     });
 
     res.status(201).json(location);

@@ -1,13 +1,13 @@
 import { Router } from 'express';
 
 import {
-  getCategoriesWithRegions,
-  getCategoriesWithLocationTypes,
+  getAllRegions,
+  getAllLocationTypes,
 } from '../controllers/categoryController.js';
 
 const router = Router();
 
-router.get('/', getCategoriesWithRegions);
-router.get('/location-types', getCategoriesWithLocationTypes);
+router.get('/', getAllRegions);
+router.get('/location-types', getAllLocationTypes);
 
 export default router;
