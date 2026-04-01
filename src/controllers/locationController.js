@@ -43,8 +43,15 @@ export const getLocationById = async (req, res, next) => {
 };
 export const createLocation = async (req, res, next) => {
   try {
+    const locationData = { ...req.body };
+
+    // Якщо multer обробив файл, додаємо шлях до нього в об'єкт локації
+    if (req.file) {
+      locationData.image = req.file.path; // або req.file.filename залежно від налаштувань
+    }
+
     const location = await Location.create({
-      ...req.body,
+      ...locationData,
       createdBy: req.user._id,
     });
 
