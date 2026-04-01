@@ -33,6 +33,12 @@ const userSchema = new Schema(
   },
 );
 
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
+
 const User = model('User', userSchema);
 
 export { User };
