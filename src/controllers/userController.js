@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import { Location } from '../models/location.js';
 import { getCurrentUser, getUserById } from '../services/userService.js';
+import { updateUser } from '../services/userService.js';
 
 // ! GET
 export const getUserLocations = async (req, res, next) => {
@@ -76,6 +77,21 @@ export const getUserByIdController = async (req, res, next) => {
       status: 200,
       message: 'Successfully found user',
       data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateUserController = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const updatedUser = await updateUser(userId, req.body);
+
+    res.json({
+      status: 200,
+      message: 'Successfully update user',
+      data: updatedUser,
     });
   } catch (error) {
     next(error);

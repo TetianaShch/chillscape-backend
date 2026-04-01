@@ -1,19 +1,20 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
+
 import { connectMongoDB } from './db/connectMongoDB.js';
 // / Routes
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import locationRoutes from './routes/locationRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
+
 // / Middlewares
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
-
-dotenv.config();
 
 const app = express();
 
@@ -25,14 +26,13 @@ await connectMongoDB();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use('/api', categoryRoutes);
 
 // ! Routes
-
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/feedbacks', feedbackRoutes);
 
 // test route
 app.get('/', (req, res) => {

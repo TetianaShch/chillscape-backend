@@ -18,13 +18,9 @@ const asyncHandler = (fn) => (req, res, next) => {
   return Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-router.post(
-  '/auth/register',
-  celebrate(registerUserSchema),
-  asyncHandler(registerUser),
-);
-router.post('/auth/login', celebrate(loginUserSchema), asyncHandler(loginUser));
-router.post('/auth/logout', asyncHandler(logoutUser));
-router.post('/auth/refresh', asyncHandler(refreshUserSession));
+router.post('/register', celebrate(registerUserSchema), asyncHandler(registerUser));
+router.post('/login', celebrate(loginUserSchema), asyncHandler(loginUser));
+router.post('/logout', asyncHandler(logoutUser));
+router.post('/refresh', asyncHandler(refreshUserSession));
 
 export default router;
