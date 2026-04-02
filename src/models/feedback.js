@@ -1,10 +1,10 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 
 const feedbackSchema = new Schema(
   {
     place: {
       type: Schema.Types.ObjectId,
-      ref: "Location",
+      ref: 'Location',
       required: true,
     },
     userName: {
@@ -23,8 +23,8 @@ const feedbackSchema = new Schema(
       trim: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const Feedback = model("Feedback", feedbackSchema);
+const Feedback = model('Feedback', feedbackSchema);
 export default Feedback;

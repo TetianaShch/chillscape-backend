@@ -18,7 +18,7 @@ const locationTypeSchema = new Schema(
       trim: true,
     },
   },
-  { timestamps: true, versionKey: false },
+  { timestamps: true, versionKey: false, collection: 'location_types' },
 );
 
 const LocationType = model('LocationType', locationTypeSchema);
