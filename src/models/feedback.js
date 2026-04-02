@@ -1,31 +1,30 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 
 const feedbackSchema = new Schema(
   {
     place: {
       type: Schema.Types.ObjectId,
-      ref: "Location",
+      ref: 'Location',
       required: true,
     },
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    userName: {
+      type: String,
       required: true,
     },
-    rating: {
+    rate: {
       type: Number,
       min: 1,
       max: 5,
       required: true,
     },
-    comment: {
+    description: {
       type: String,
       required: true,
       trim: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-feedbackSchema.index({ place: 1, user: 1 }, { unique: true });
-const Feedback = model("Feedback", feedbackSchema);
+
+const Feedback = model('Feedback', feedbackSchema);
 export default Feedback;
