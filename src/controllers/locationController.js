@@ -50,7 +50,7 @@ export const createLocation = async (req, res, next) => {
   try {
     const location = await Location.create({
       ...req.body,
-      ownerId: req.user._id,
+      createdBy: req.user._id,
     });
 
     res.status(201).json(location);
