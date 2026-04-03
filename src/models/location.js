@@ -4,7 +4,7 @@ import { Schema, model } from 'mongoose';
 const locationSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
-    type: { type: String, required: true, maxlength: 64 },
+    locationType: { type: String, required: true, maxlength: 64 },
     region: { type: String, required: true, trim: true, maxlength: 64 },
     description: {
       type: String,

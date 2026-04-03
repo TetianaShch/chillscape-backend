@@ -80,7 +80,7 @@ export const createLocation = async (req, res, next) => {
 };
 export const updateLocation = async (req, res, next) => {
   const { locationId } = req.params;
-  const userId = req.user._id; // Отримуємо ID з мидлвара authenticate
+  const userId = req.user._id;
 
   try {
     const location = await Location.findById(locationId);
@@ -89,19 +89,40 @@ export const updateLocation = async (req, res, next) => {
       return next(createHttpError(404, 'Location not found'));
     }
 
-    // ПЕРЕВІРКА АВТОРСТВА: порівнюємо ID з поля createdBy з ID юзера
+    // 1. ПЕРЕВІРКА АВТОРСТВА
     if (location.createdBy.toString() !== userId.toString()) {
-      return next(createHttpError(403, 'Forbidden: You are not the author of this article'));
+      return next(createHttpError(403, 'Forbidden: You are not the author of this location'));
     }
-    // Якщо multer обробив файл, додаємо шлях до нього в об'єкт локації
-    if (req.file) {
-      const cloudinaryResult = await saveFileToCloudinary(req.file.buffer);
-      req.body.image = cloudinaryResult;
+
+    // 2. ОБРОБКА НОВИХ КАРТИНОК (якщо вони прийшли)
+    let newImageUrls = [];
+    if (req.files && req.files.length > 0) {
+      // Завантажуємо масив буферів у Cloudinary
+      const uploadPromises = req.files.map((file, index) =>
+        saveFileToCloudinary(file.buffer, `${locationId}_update_${Date.now()}_${index}`)
+      );
+
+      const cloudinaryResults = await Promise.all(uploadPromises);
+      // Дістаємо посилання secure_url з результатів
+      newImageUrls = cloudinaryResults.map(result => result.secure_url);
     }
+
+    // 3. ФОРМУЄМО ДАНІ ДЛЯ ОНОВЛЕННЯ
+    const updateData = { ...req.body };
+
+    // Якщо прийшли нові фото, додаємо їх до масиву існуючих
+    if (newImageUrls.length > 0) {
+      updateData.images = [...location.images, ...newImageUrls];
+    }
+
+    // 4. ОНОВЛЕННЯ В БАЗІ
     const updatedLocation = await Location.findByIdAndUpdate(
       locationId,
-      req.body,
-      { new: true } // Повертає вже оновлений документ
+      updateData,
+      {
+        new: true,           // Повертає оновлений об'єкт
+        runValidators: true  // Перевіряє дані за схемою Mongoose
+      }
     );
 
     res.status(200).json({
@@ -109,6 +130,7 @@ export const updateLocation = async (req, res, next) => {
       message: "Successfully patched a location!",
       data: updatedLocation,
     });
+
   } catch (error) {
     next(error);
   }
