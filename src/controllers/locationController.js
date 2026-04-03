@@ -1,5 +1,6 @@
 import { Location } from '../models/location.js';
 import createHttpError from 'http-errors';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 
 
 export const getAllLocations = async (req, res, next) => {
@@ -52,11 +53,13 @@ export const createLocation = async (req, res, next) => {
 
     // Якщо multer обробив файл, додаємо шлях до нього в об'єкт локації
     if (req.file) {
-      locationData.image = req.file.path; // або req.file.filename залежно від налаштувань
+      const cloudinaryResult = await saveFileToCloudinary(req.file.buffer);
+      locationData.image = cloudinaryResult;
     }
 
     const location = await Location.create({
       ...locationData,
+      images: req.files.map(file => file.path), // Додаємо масив URL зображень
       createdBy: req.user._id,
     });
 
@@ -80,7 +83,11 @@ export const updateLocation = async (req, res, next) => {
     if (location.createdBy.toString() !== userId.toString()) {
       return next(createHttpError(403, 'Forbidden: You are not the author of this article'));
     }
-
+    // Якщо multer обробив файл, додаємо шлях до нього в об'єкт локації
+    if (req.file) {
+      const cloudinaryResult = await saveFileToCloudinary(req.file.buffer);
+      req.body.image = cloudinaryResult;
+    }
     const updatedLocation = await Location.findByIdAndUpdate(
       locationId,
       req.body,

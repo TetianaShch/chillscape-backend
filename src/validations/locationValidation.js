@@ -21,7 +21,6 @@ export const createLocationSchema = {
     type: Joi.string().max(64).required(),
     region: Joi.string().max(64).required(),
     description: Joi.string().min(20).max(6000).required(),
-    images: Joi.array().items(Joi.string()).min(1).required(),
   }),
 };
 
