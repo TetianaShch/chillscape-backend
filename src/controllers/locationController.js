@@ -51,15 +51,25 @@ export const createLocation = async (req, res, next) => {
   try {
     const locationData = { ...req.body };
 
-    // Якщо multer обробив файл, додаємо шлях до нього в об'єкт локації
-    if (req.file) {
-      const cloudinaryResult = await saveFileToCloudinary(req.file.buffer);
-      locationData.image = cloudinaryResult;
-    }
+   // 1. Перевіряємо, чи є файли в req.files
+    const files = req.files || [];
 
+    // 2. Завантажуємо ВСІ файли в Cloudinary паралельно
+    // Ми використовуємо Promise.all, щоб не чекати кожну картинку по черзі
+    const uploadPromises = files.map((file, index) => {
+      // Передаємо буфер та унікальний ID (наприклад, назва + індекс)
+      return saveFileToCloudinary(file.buffer, `${Date.now()}_${index}`);
+    });
+
+    const uploadResults = await Promise.all(uploadPromises);
+
+    // 3. Витягуємо URL з результатів Cloudinary
+    const imageUrls = uploadResults.map(result => result.secure_url);
+
+    // 4. Створюємо запис у БД
     const location = await Location.create({
       ...locationData,
-      images: req.files.map(file => file.path), // Додаємо масив URL зображень
+      images: imageUrls, // Тепер тут буде масив посилань
       createdBy: req.user._id,
     });
 
