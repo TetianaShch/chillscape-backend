@@ -102,6 +102,7 @@ export const createFeedback = async (req, res, next) => {
     const user = await User.findById(req.user._id).select('name');
 
     const feedback = await Feedback.create({
+      place: req.body.place,
       rate: req.body.rate,
       description: req.body.description,
       userName: user?.name || 'Невідомий автор',
