@@ -1,6 +1,5 @@
 import { Joi, Segments } from 'celebrate';
 
-
 export const getAllLocationsSchema = {
   [Segments.QUERY]: Joi.object().keys({
     page: Joi.number().integer().min(1).default(1),
@@ -8,6 +7,7 @@ export const getAllLocationsSchema = {
     region: Joi.string().optional(),
     type: Joi.string().optional(),
     search: Joi.string().allow('').optional(),
+    sort: Joi.string().valid('rating', 'newest').optional(),
   }),
 };
 export const getLocationIdSchema = {
@@ -37,7 +37,3 @@ export const updateLocationSchema = {
     images: Joi.array().items(Joi.string()).min(1),
   }),
 };
-
-
-
-
