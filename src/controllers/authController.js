@@ -77,7 +77,7 @@ const refreshUserSession = async (req, res) => {
   await Session.deleteOne({
     _id: req.cookies.sessionId,
     refreshToken: req.cookies.refreshToken
-  })
+  });
 
   const newSession = await createSession(session.userId);
   setSessionCookies(res, newSession);
