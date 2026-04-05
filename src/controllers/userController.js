@@ -7,12 +7,20 @@ import { updateUser } from '../services/userService.js';
 export const getUserLocations = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const { page, limit, search, sortBy, sortOrder } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = '_id',
+      sortOrder = 'desc',
+    } = req.query;
 
-    const skip = (page - 1) * limit;
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
 
     const filter = {
-      createdBy: userId,
+      ownerId: userId,
     };
 
     if (search) {
@@ -23,18 +31,18 @@ export const getUserLocations = async (req, res, next) => {
       Location.countDocuments(filter),
       Location.find(filter)
         .skip(skip)
-        .limit(limit)
+        .limit(limitNumber)
         .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 }),
     ]);
 
-    const totalPages = Math.ceil(totalItems / limit);
+    const totalPages = Math.ceil(totalItems / limitNumber);
 
     res.status(200).json({
       status: 200,
       message: 'Successfully fetched user locations',
       data: {
-        page,
-        limit,
+        page: pageNumber,
+        limit: limitNumber,
         totalItems,
         totalPages,
         locations,
