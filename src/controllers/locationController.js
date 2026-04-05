@@ -2,22 +2,44 @@ import { Location } from '../models/location.js';
 import createHttpError from 'http-errors';
 import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 
-
 export const getAllLocations = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, region, locationType, type, search } = req.query;
+    const { page = 1, limit = 10, region, type, search, sort } = req.query;
+
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
     const filter = {};
 
     if (region) filter.region = region;
-    if (locationType || type) filter.locationType = locationType || type;
+    if (type) filter.locationType = type;
     if (search) filter.name = { $regex: search, $options: 'i' };
 
-    const skip = (pageNumber - 1) * limitNumber;
+    let sortOption = {};
+
+    if (sort === 'rating') {
+      sortOption = { rate: -1 };
+    }
+
+    if (sort === 'newest') {
+      sortOption = { createdAt: -1 };
+    }
+
+    if (sort === 'alphabet_asc') {
+      sortOption = { name: 1 };
+    }
+
+    if (sort === 'alphabet_desc') {
+      sortOption = { name: -1 };
+    }
 
     const [locations, totalLocations] = await Promise.all([
-      Location.find(filter).skip(skip).limit(limitNumber),
+      Location.find(filter)
+        .collation({ locale: 'uk', strength: 1 })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limitNumber),
       Location.countDocuments(filter),
     ]);
 
@@ -42,7 +64,11 @@ export const getLocationById = async (req, res, next) => {
   try {
     const location = await Location.findById(locationId);
     if (!location) throw createHttpError(404, 'Location not found');
-    res.json({ status: 200, message: `Successfully found location with id ${locationId}!`, data: location });
+    res.json({
+      status: 200,
+      message: `Successfully found location with id ${locationId}!`,
+      data: location,
+    });
   } catch (error) {
     next(error);
   }
@@ -91,7 +117,12 @@ export const updateLocation = async (req, res, next) => {
 
     // 1. ПЕРЕВІРКА АВТОРСТВА
     if (location.createdBy.toString() !== userId.toString()) {
-      return next(createHttpError(403, 'Forbidden: You are not the author of this location'));
+      return next(
+        createHttpError(
+          403,
+          'Forbidden: You are not the author of this article',
+        ),
+      );
     }
 
     // 2. ОБРОБКА НОВИХ КАРТИНОК (якщо вони прийшли)
@@ -118,16 +149,13 @@ export const updateLocation = async (req, res, next) => {
     // 4. ОНОВЛЕННЯ В БАЗІ
     const updatedLocation = await Location.findByIdAndUpdate(
       locationId,
-      updateData,
-      {
-        new: true,           // Повертає оновлений об'єкт
-        runValidators: true  // Перевіряє дані за схемою Mongoose
-      }
+      req.body,
+      { new: true }, // Повертає вже оновлений документ
     );
 
     res.status(200).json({
       status: 200,
-      message: "Successfully patched a location!",
+      message: 'Successfully patched a location!',
       data: updatedLocation,
     });
 
