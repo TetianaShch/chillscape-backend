@@ -24,7 +24,7 @@ router.get('/:locationId', celebrate(getLocationIdSchema), getLocationById);
 router.post(
   '/add',
   authenticate,
-  upload.array('images', 5), // Дозволяємо завантажувати до 5 зображень
+  upload.single('image'),
   celebrate(createLocationSchema),
   createLocation
 );
@@ -33,7 +33,7 @@ router.post(
 router.patch(
   '/:locationId',
   authenticate,
-  upload.array('images', 5), // Дозволяємо завантажувати до 5 зображень
+  upload.single('image'),
   celebrate(updateLocationSchema),
   updateLocation
 );

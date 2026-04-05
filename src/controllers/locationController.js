@@ -75,36 +75,31 @@ export const getLocationById = async (req, res, next) => {
 };
 export const createLocation = async (req, res, next) => {
   try {
-    const locationData = { ...req.body };
+    const userId = req.user._id;
+    let imageUrl = '';
 
-   // 1. Перевіряємо, чи є файли в req.files
-    const files = req.files || [];
+    if (req.file) {
+      const result = await saveFileToCloudinary(req.file.buffer, `create_${Date.now()}`);
+      imageUrl = result.secure_url;
+    }
 
-    // 2. Завантажуємо ВСІ файли в Cloudinary паралельно
-    // Ми використовуємо Promise.all, щоб не чекати кожну картинку по черзі
-    const uploadPromises = files.map((file, index) => {
-      // Передаємо буфер та унікальний ID (наприклад, назва + індекс)
-      return saveFileToCloudinary(file.buffer, `${Date.now()}_${index}`);
-    });
-
-    const uploadResults = await Promise.all(uploadPromises);
-
-    // 3. Витягуємо URL з результатів Cloudinary
-    const imageUrls = uploadResults.map(result => result.secure_url);
-
-    // 4. Створюємо запис у БД
+    // Передаємо ownerId замість createdBy
     const location = await Location.create({
-      ...locationData,
-      images: imageUrls, // Тепер тут буде масив посилань
-      createdBy: req.user._id,
-      ownerId: req.user._id,
+      ...req.body,
+      image: imageUrl,
+      ownerId: userId,
     });
 
-    res.status(201).json(location);
+    res.status(201).json({
+      status: 201,
+      message: "Successfully created!",
+      data: location, // Повертаємо весь об'єкт, щоб фронтенд міг взяти _id
+    });
   } catch (error) {
     next(error);
   }
 };
+
 export const updateLocation = async (req, res, next) => {
   const { locationId } = req.params;
   const userId = req.user._id;
@@ -116,42 +111,23 @@ export const updateLocation = async (req, res, next) => {
       return next(createHttpError(404, 'Location not found'));
     }
 
-    // 1. ПЕРЕВІРКА АВТОРСТВА
-    if (location.createdBy.toString() !== userId.toString()) {
-      return next(
-        createHttpError(
-          403,
-          'Forbidden: You are not the author of this article',
-        ),
-      );
+    // Перевірка авторства через ownerId
+    if (location.ownerId.toString() !== userId.toString()) {
+      return next(createHttpError(403, 'Forbidden: You are not the owner of this location'));
     }
 
-    // 2. ОБРОБКА НОВИХ КАРТИНОК (якщо вони прийшли)
-    let newImageUrls = [];
-    if (req.files && req.files.length > 0) {
-      // Завантажуємо масив буферів у Cloudinary
-      const uploadPromises = req.files.map((file, index) =>
-        saveFileToCloudinary(file.buffer, `${locationId}_update_${Date.now()}_${index}`)
-      );
-
-      const cloudinaryResults = await Promise.all(uploadPromises);
-      // Дістаємо посилання secure_url з результатів
-      newImageUrls = cloudinaryResults.map(result => result.secure_url);
-    }
-
-    // 3. ФОРМУЄМО ДАНІ ДЛЯ ОНОВЛЕННЯ
     const updateData = { ...req.body };
 
-    // Якщо прийшли нові фото, додаємо їх до масиву існуючих
-    if (newImageUrls.length > 0) {
-      updateData.images = [...location.images, ...newImageUrls];
+    // Обробка ОДНІЄЇ нової картинки
+    if (req.file) {
+      const result = await saveFileToCloudinary(req.file.buffer, `update_${locationId}_${Date.now()}`);
+      updateData.image = result.secure_url;
     }
 
-    // 4. ОНОВЛЕННЯ В БАЗІ
     const updatedLocation = await Location.findByIdAndUpdate(
       locationId,
-      req.body,
-      { new: true }, // Повертає вже оновлений документ
+      updateData, // Використовуємо підготовлений об'єкт з картинкою
+      { new: true, runValidators: true }
     );
 
     res.status(200).json({
