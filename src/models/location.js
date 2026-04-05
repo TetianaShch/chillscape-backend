@@ -19,7 +19,7 @@ const locationSchema = new Schema(
       maxlength: 6000,
     },
     images: [{ type: String, required: true }],
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 
     feedbacksId: [
       {
