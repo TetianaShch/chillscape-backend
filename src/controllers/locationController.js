@@ -25,8 +25,20 @@ export const getAllLocations = async (req, res, next) => {
       sortOption = { createdAt: -1 };
     }
 
+    if (sort === 'alphabet_asc') {
+      sortOption = { name: 1 };
+    }
+
+    if (sort === 'alphabet_desc') {
+      sortOption = { name: -1 };
+    }
+
     const [locations, totalLocations] = await Promise.all([
-      Location.find(filter).sort(sortOption).skip(skip).limit(limitNumber),
+      Location.find(filter)
+        .collation({ locale: 'uk', strength: 1 })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limitNumber),
       Location.countDocuments(filter),
     ]);
 

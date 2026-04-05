@@ -7,7 +7,9 @@ export const getAllLocationsSchema = {
     region: Joi.string().optional(),
     type: Joi.string().optional(),
     search: Joi.string().allow('').optional(),
-    sort: Joi.string().valid('rating', 'newest').optional(),
+    sort: Joi.string()
+      .valid('rating', 'newest', 'alphabet_asc', 'alphabet_desc')
+      .optional(),
   }),
 };
 export const getLocationIdSchema = {
