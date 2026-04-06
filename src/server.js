@@ -15,7 +15,6 @@ import feedbackRoutes from './routes/feedbackRoutes.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
-
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -26,6 +25,7 @@ await connectMongoDB();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static('uploads'));
 
 // ! Routes
 app.use('/api/auth', authRoutes);
