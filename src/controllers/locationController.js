@@ -1,6 +1,15 @@
 import { Location } from '../models/location.js';
 import createHttpError from 'http-errors';
 
+const getUploadedImageUrl = (req) => {
+  const file =
+    req.files?.photo?.[0] || req.files?.image?.[0] || req.files?.images?.[0];
+
+  if (!file) return null;
+
+  return `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+};
+
 export const getAllLocations = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, region, type, search, sort } = req.query;
@@ -17,21 +26,10 @@ export const getAllLocations = async (req, res, next) => {
 
     let sortOption = {};
 
-    if (sort === 'rating') {
-      sortOption = { rate: -1 };
-    }
-
-    if (sort === 'newest') {
-      sortOption = { createdAt: -1 };
-    }
-
-    if (sort === 'alphabet_asc') {
-      sortOption = { name: 1 };
-    }
-
-    if (sort === 'alphabet_desc') {
-      sortOption = { name: -1 };
-    }
+    if (sort === 'rating') sortOption = { rate: -1 };
+    if (sort === 'newest') sortOption = { createdAt: -1 };
+    if (sort === 'alphabet_asc') sortOption = { name: 1 };
+    if (sort === 'alphabet_desc') sortOption = { name: -1 };
 
     const [locations, totalLocations] = await Promise.all([
       Location.find(filter)
@@ -60,9 +58,14 @@ export const getAllLocations = async (req, res, next) => {
 
 export const getLocationById = async (req, res, next) => {
   const { locationId } = req.params;
+
   try {
     const location = await Location.findById(locationId);
-    if (!location) throw createHttpError(404, 'Location not found');
+
+    if (!location) {
+      throw createHttpError(404, 'Location not found');
+    }
+
     res.json({
       status: 200,
       message: `Successfully found location with id ${locationId}!`,
@@ -72,11 +75,18 @@ export const getLocationById = async (req, res, next) => {
     next(error);
   }
 };
+
 export const createLocation = async (req, res, next) => {
   try {
+    const imageUrl = getUploadedImageUrl(req);
+
+    if (!imageUrl) {
+      throw createHttpError(400, 'Image is required');
+    }
+
     const location = await Location.create({
       ...req.body,
-      createdBy: req.user._id,
+      images: [imageUrl],
       ownerId: req.user._id,
     });
 
@@ -85,9 +95,10 @@ export const createLocation = async (req, res, next) => {
     next(error);
   }
 };
+
 export const updateLocation = async (req, res, next) => {
   const { locationId } = req.params;
-  const userId = req.user._id; // Отримуємо ID з мидлвара authenticate
+  const userId = req.user._id;
 
   try {
     const location = await Location.findById(locationId);
@@ -96,8 +107,7 @@ export const updateLocation = async (req, res, next) => {
       return next(createHttpError(404, 'Location not found'));
     }
 
-    // ПЕРЕВІРКА АВТОРСТВА: порівнюємо ID з поля createdBy з ID юзера
-    if (location.createdBy.toString() !== userId.toString()) {
+    if (location.ownerId.toString() !== userId.toString()) {
       return next(
         createHttpError(
           403,
@@ -106,10 +116,20 @@ export const updateLocation = async (req, res, next) => {
       );
     }
 
+    const imageUrl = getUploadedImageUrl(req);
+
+    const updateData = {
+      ...req.body,
+    };
+
+    if (imageUrl) {
+      updateData.images = [imageUrl];
+    }
+
     const updatedLocation = await Location.findByIdAndUpdate(
       locationId,
-      req.body,
-      { new: true }, // Повертає вже оновлений документ
+      updateData,
+      { new: true },
     );
 
     res.status(200).json({

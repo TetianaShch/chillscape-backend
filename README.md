@@ -58,40 +58,43 @@ GET /
 
 ### Auth
 
-- POST /api/auth/register
-- POST /api/auth/login
-- POST /api/auth/logout
-- POST /api/auth/refresh
+- `POST /api/auth/register` — реєстрація нового користувача
+- `POST /api/auth/login` — вхід у систему
+- `POST /api/auth/logout` — вихід з акаунту (private)
+- `POST /api/auth/refresh` — оновлення сесії
+
+---
 
 ### Users
 
-- GET /api/users/current
-- GET /api/users/:userId
+- `GET /api/users/current` — отримання даних поточного користувача (private)
+- `GET /api/users/:userId` — отримання публічної інформації про користувача
+- `GET /api/users/:userId/locations` — отримання локацій користувача
+- `PATCH /api/users/` — оновлення профілю користувача (private)
+
+---
 
 ### Locations
 
-- GET /api/locations
-- GET /api/locations/:locationId
-- POST /api/locations (private)
-- PATCH /api/locations/:locationId (private)
+- `GET /api/locations` — отримання списку локацій
+- `GET /api/locations/:locationId` — отримання деталей локації
+- `POST /api/locations` — створення нової локації (private)
+- `PATCH /api/locations/:locationId` — редагування локації (private)
 
-Query params:
-
-- page
-- limit
-- region
-- type
-- search
-
-### Categories
-
-- GET /api/categories
-- GET /api/categories/location-types
+---
 
 ### Feedbacks
 
-- GET /api/feedbacks/:placeId
-- POST /api/feedbacks (private)
+- `GET /api/feedbacks` — отримання останніх відгуків
+- `GET /api/feedbacks/:placeId` — отримання відгуків для конкретної локації
+- `POST /api/feedbacks` — створення нового відгуку (private)
+
+---
+
+### Categories
+
+- `GET /api/categories` — отримання списку регіонів
+- `GET /api/categories/location-types` — отримання типів локацій
 
 ## Deployment
 
