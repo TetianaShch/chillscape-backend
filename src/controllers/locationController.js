@@ -1,17 +1,9 @@
 import { Location } from '../models/location.js';
 import createHttpError from 'http-errors';
+import { uploadImageToCloudinary } from '../services/cloudinary.js';
 
-const getUploadedImageUrl = (req) => {
-  const file =
-    req.files?.photo?.[0] || req.files?.image?.[0] || req.files?.images?.[0];
-
-  if (!file) return null;
-
-  const baseUrl =
-    process.env.APP_DOMAIN || `${req.protocol}://${req.get('host')}`;
-
-  return `${baseUrl}/uploads/${file.filename}`;
-};
+const getUploadedFile = (req) =>
+  req.files?.photo?.[0] || req.files?.image?.[0] || req.files?.images?.[0];
 
 export const getAllLocations = async (req, res, next) => {
   try {
@@ -117,7 +109,7 @@ export const getLocationById = async (req, res, next) => {
 
 export const createLocation = async (req, res, next) => {
   try {
-    const imageUrl = getUploadedImageUrl(req);
+    const imageUrl = await uploadImageToCloudinary(getUploadedFile(req));
 
     if (!imageUrl) {
       throw createHttpError(400, 'Image is required');
@@ -155,7 +147,7 @@ export const updateLocation = async (req, res, next) => {
       );
     }
 
-    const imageUrl = getUploadedImageUrl(req);
+    const imageUrl = await uploadImageToCloudinary(getUploadedFile(req));
 
     const updateData = {
       ...req.body,
