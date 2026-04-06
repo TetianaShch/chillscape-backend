@@ -7,7 +7,10 @@ const getUploadedImageUrl = (req) => {
 
   if (!file) return null;
 
-  return `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+  const baseUrl =
+    process.env.APP_DOMAIN || `${req.protocol}://${req.get('host')}`;
+
+  return `${baseUrl}/uploads/${file.filename}`;
 };
 
 export const getAllLocations = async (req, res, next) => {
@@ -18,26 +21,62 @@ export const getAllLocations = async (req, res, next) => {
     const limitNumber = Number(limit);
     const skip = (pageNumber - 1) * limitNumber;
 
-    const filter = {};
+    const matchStage = {};
 
-    if (region) filter.region = region;
-    if (type) filter.locationType = type;
-    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (region) matchStage.region = region;
+    if (type) matchStage.locationType = type;
+    if (search) {
+      matchStage.name = { $regex: search, $options: 'i' };
+    }
 
-    let sortOption = {};
+    let sortStage = { _id: 1 };
 
-    if (sort === 'rating') sortOption = { rate: -1 };
-    if (sort === 'newest') sortOption = { createdAt: -1 };
-    if (sort === 'alphabet_asc') sortOption = { name: 1 };
-    if (sort === 'alphabet_desc') sortOption = { name: -1 };
+    if (sort === 'rating') {
+      sortStage = { rate: -1, _id: 1 };
+    }
+
+    if (sort === 'newest') {
+      sortStage = { createdAt: -1, _id: 1 };
+    }
+
+    if (sort === 'alphabet_asc') {
+      sortStage = { name: 1, _id: 1 };
+    }
+
+    if (sort === 'alphabet_desc') {
+      sortStage = { name: -1, _id: 1 };
+    }
+
+    const pipeline = [
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: 'feedbacks',
+          localField: 'feedbacksId',
+          foreignField: '_id',
+          as: 'feedbacks',
+        },
+      },
+      {
+        $addFields: {
+          rate: {
+            $ifNull: [{ $avg: '$feedbacks.rate' }, 0],
+          },
+        },
+      },
+      {
+        $project: {
+          feedbacks: 0,
+        },
+      },
+      { $sort: sortStage },
+      { $skip: skip },
+      { $limit: limitNumber },
+    ];
 
     const [locations, totalLocations] = await Promise.all([
-      Location.find(filter)
-        .collation({ locale: 'uk', strength: 1 })
-        .sort(sortOption)
-        .skip(skip)
-        .limit(limitNumber),
-      Location.countDocuments(filter),
+      Location.aggregate(pipeline).collation({ locale: 'uk', strength: 1 }),
+      Location.countDocuments(matchStage),
     ]);
 
     const totalPages = Math.ceil(totalLocations / limitNumber);

@@ -17,6 +17,8 @@ import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 
 await connectMongoDB();
@@ -33,11 +35,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/feedbacks', feedbackRoutes);
-
-// test route
-app.get('/', (req, res) => {
-  res.json({ message: 'Backend is running' });
-});
 
 // error handling middlewares
 app.use(notFoundHandler);
