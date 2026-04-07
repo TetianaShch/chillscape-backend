@@ -52,7 +52,11 @@ export const getAllLocations = async (req, res, next) => {
       {
         $addFields: {
           rate: {
-            $ifNull: [{ $avg: '$feedbacks.rate' }, 0],
+            $cond: {
+              if: { $gt: [{ $size: '$feedbacks' }, 0] },
+              then: { $round: [{ $avg: '$feedbacks.rate' }, 1] },
+              else: '$rate',
+            },
           },
         },
       },
